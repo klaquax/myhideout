@@ -1,0 +1,168 @@
+<!-- 1. Version von https://natenom.de/2022/04/einbindung-von-bildern-in-hugo-infos-und-render-hook/#wie-der-neue-render-hook-funktioniert -->
+
+<!-- {{ $autolinking := .Page.Param "imageAutoLink" | default true }}
+{{- $img := .Page.Resources.GetMatch .Destination -}}
+{{- if and (not $img) .Page.File -}}
+{{ $path := path.Join .Page.File.Dir .Destination }}
+{{- $img = resources.Get $path -}}
+{{- end -}}
+{{- with $img -}}
+{{- $large := $img.Resize "816x" -}}
+{{- $medium := $img.Resize "500x" -}}
+{{- $small := $img.Resize "360x" -}}
+<figure class="image-caption">
+{{ if gt $img.Width 816 }}
+	{{ if and (gt $img.Width 1000) (eq $autolinking true ) }}<a href="{{- $img.RelPermalink -}}">{{ end }}
+    <img alt="{{ $.Text }}" srcset="
+        {{ $small.RelPermalink }} 360w,
+        {{ $medium.RelPermalink }} 500w,
+        {{ $large.RelPermalink }} 816w" sizes="(max-width: 424px) 360px,(max-width: 596px) 500px,(min-width: 565px) 816px" src="{{ $small.RelPermalink }}" title="{{ $.Title }}" loading="lazy" />
+    {{ if and (gt $img.Width 1000) (eq $autolinking true ) }}</a>{{ end }}
+{{ else }}
+    <img alt="{{ $.Text }}" src="{{ $img.RelPermalink }}" loading="lazy" title="{{ $.Title }}" />
+{{ end }}
+    <figcaption>{{ with $.Title | safeHTML }}{{ . }}{{ end }}</figcaption>
+</figure>
+{{- else -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ $.Text }}" title="{{ $.Title }}" loading="lazy" />{{- end -}}
+ -->
+
+<!-- adapted from https://github.com/bep/portable-hugo-links/blob/master/layouts/_default/_markup/render-image.html -->
+
+
+
+<!-- 2. Version von https://natenom.de/2022/04/verbesserungen-des-render-hooks-fuer-bilder-und-im-wiki/ -->
+
+</p>
+{{- $autolinking := .Page.Param "imageAutoLink" | default false -}}
+{{- $minwidth_to_link := 1000 -}}
+
+
+{{- $original_img := .Page.Resources.GetMatch .Destination -}}
+{{- if and (not $original_img) .Page.File -}}
+    {{- $path := path.Join .Page.File.Dir .Destination -}}
+    {{- $original_img = resources.Get $path -}}
+{{- end -}}
+{{- with $original_img -}}
+    {{- $image_webp_360 := "" -}}
+    {{- $image_webp_500 := "" -}}
+    {{- $image_webp_816 := "" -}}
+    {{- $image_webp_1632 := "" -}}
+    {{- $image_webp_full := "" -}}
+
+    {{- $image_jpg_360 := "" -}}
+    {{- $image_jpg_500 := "" -}}
+    {{- $image_jpg_816 := "" -}}
+    {{- $image_jpg_1632 := "" -}}
+    {{- $image_jpg_full := "" -}}
+
+    {{- if ge $original_img.Width 816 -}}
+        {{- $image_jpg_360 = $original_img.Resize "360x jpg" -}}
+        {{- $image_jpg_500 = $original_img.Resize "500x jpg" -}}
+        {{- $image_jpg_816 = $original_img.Resize "816x jpg" -}}
+
+        {{- $image_webp_360 = $original_img.Resize "360x webp" -}}
+        {{- $image_webp_500 = $original_img.Resize "500x webp" -}}
+        {{- $image_webp_816 = $original_img.Resize "816x webp" -}}
+
+        {{- if gt $original_img.Width 1632 -}}
+            {{- $image_jpg_1632 = $original_img.Resize "1632x jpg" -}}
+            {{- $image_webp_1632 = $original_img.Resize "1632x webp" -}}
+        {{- end -}}
+    {{- else -}} <!-- Bilder sind kleiner als 816, die _full brauchen wir nur dann zum Direkteinbinden. -->
+	    {{ if ne $original_img.MediaType.SubType "webp" -}}
+    	   {{- $image_webp_full = $original_img.Resize (printf "%dx webp" $original_img.Width) -}}
+	    {{- end -}}
+
+	    {{ if ne $original_img.MediaType.SubType "jpeg" -}}
+	       {{- $image_jpg_full = $original_img.Resize (printf "%dx jpg" $original_img.Width) -}}
+	    {{- end -}}
+    {{- end -}}
+</p>
+{{- $autolinking := .Page.Param "imageAutoLink" | default false -}}
+{{- $minwidth_to_link := 1000 -}}
+
+
+{{- $original_img := .Page.Resources.GetMatch .Destination -}}
+{{- if and (not $original_img) .Page.File -}}
+    {{- $path := path.Join .Page.File.Dir .Destination -}}
+    {{- $original_img = resources.Get $path -}}
+{{- end -}}
+{{- with $original_img -}}
+    {{- $image_webp_360 := "" -}}
+    {{- $image_webp_500 := "" -}}
+    {{- $image_webp_816 := "" -}}
+    {{- $image_webp_1632 := "" -}}
+    {{- $image_webp_full := "" -}}
+
+    {{- $image_jpg_360 := "" -}}
+    {{- $image_jpg_500 := "" -}}
+    {{- $image_jpg_816 := "" -}}
+    {{- $image_jpg_1632 := "" -}}
+    {{- $image_jpg_full := "" -}}
+
+    {{- if ge $original_img.Width 816 -}}
+        {{- $image_jpg_360 = $original_img.Resize "360x jpg" -}}
+        {{- $image_jpg_500 = $original_img.Resize "500x jpg" -}}
+        {{- $image_jpg_816 = $original_img.Resize "816x jpg" -}}
+
+        {{- $image_webp_360 = $original_img.Resize "360x webp" -}}
+        {{- $image_webp_500 = $original_img.Resize "500x webp" -}}
+        {{- $image_webp_816 = $original_img.Resize "816x webp" -}}
+
+        {{- if gt $original_img.Width 1632 -}}
+            {{- $image_jpg_1632 = $original_img.Resize "1632x jpg" -}}
+            {{- $image_webp_1632 = $original_img.Resize "1632x webp" -}}
+        {{- end -}}
+    {{- else -}} <!-- Bilder sind kleiner als 816, die _full brauchen wir nur dann zum Direkteinbinden. -->
+	    {{ if ne $original_img.MediaType.SubType "webp" -}}
+    	   {{- $image_webp_full = $original_img.Resize (printf "%dx webp" $original_img.Width) -}}
+	    {{- end -}}
+
+	    {{ if ne $original_img.MediaType.SubType "jpeg" -}}
+	       {{- $image_jpg_full = $original_img.Resize (printf "%dx jpg" $original_img.Width) -}}
+	    {{- end -}}
+    {{- end -}}
+
+
+    <figure class="image-caption">
+    {{- if ge $original_img.Width 816 -}}
+    		{{- if and (ge $original_img.Width $minwidth_to_link ) (eq $autolinking true ) -}}<a href="{{- $original_img.RelPermalink -}}">{{- end -}}
+            <picture>
+                <source type="image/webp" srcset="{{ $image_webp_360.RelPermalink }} 360w, {{- $image_webp_500.RelPermalink }} 500w, {{- $image_webp_816.RelPermalink }} 816w {{- with $image_webp_1632 -}}, {{ .RelPermalink }} 1632w{{- end -}}"
+                                          sizes="(max-width: 424px) 360px, (max-width: 596px) 500px, (min-width: 565px) 816px {{- if gt $original_img.Width 1632 -}},(min-width: 1200px) 1632px{{- end -}}" />
+                <img alt="{{- $.Text -}}" srcset="{{ $image_jpg_360.RelPermalink }} 360w, {{ $image_jpg_500.RelPermalink }} 500w, {{ $image_jpg_816.RelPermalink }} 816w {{- with $image_jpg_1632 -}},{{ .RelPermalink }} 1632w{{- end -}}"
+                     sizes="(max-width: 424px) 360px, (max-width: 596px) 500px, (min-width: 565px) 816px {{- if gt $original_img.Width 1632 -}},(min-width: 1200px) 1632px{{- end -}}"
+                     src="{{ with $image_jpg_816 -}}{{ .RelPermalink }}{{- end -}}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" loading="lazy" width="{{- $image_jpg_816.Width -}}" height="{{- $image_jpg_816.Height -}}" />
+	{{- else -}}
+			<picture><source type="image/webp" srcset="{{- if eq .MediaType.SubType "webp" -}}{{ $original_img.RelPermalink }}{{- else -}}{{ $image_webp_full.RelPermalink }}{{- end -}}" />
+			         <img alt="{{- $.Text -}}" src="{{- if eq .MediaType.SubType "jpeg" -}}{{ $original_img.RelPermalink }}{{- else -}}{{ $image_jpg_full.RelPermalink }}{{- end -}}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" width="{{- $original_img.Width -}}" height="{{- $original_img.Height -}}" loading="lazy" />
+	{{- end -}}
+                </picture>
+    			{{- if and (gt $original_img.Width 1000) (eq $autolinking true ) -}}</a>{{- end -}}
+                <figcaption>{{- with $.Title | safeHTML }}{{ . }}{{ end -}}</figcaption></figure>
+{{- else -}} 
+<img src="{{ .Destination | safeURL }}" alt="{{ $.Text }}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" loading="lazy" /> 
+{{- end -}}
+<p>
+
+    <figure class="image-caption">
+    {{- if ge $original_img.Width 816 -}}
+    		{{- if and (ge $original_img.Width $minwidth_to_link ) (eq $autolinking true ) -}}<a href="{{- $original_img.RelPermalink -}}">{{- end -}}
+            <picture>
+                <source type="image/webp" srcset="{{ $image_webp_360.RelPermalink }} 360w, {{- $image_webp_500.RelPermalink }} 500w, {{- $image_webp_816.RelPermalink }} 816w {{- with $image_webp_1632 -}}, {{ .RelPermalink }} 1632w{{- end -}}"
+                                          sizes="(max-width: 424px) 360px, (max-width: 596px) 500px, (min-width: 565px) 816px {{- if gt $original_img.Width 1632 -}},(min-width: 1200px) 1632px{{- end -}}" />
+                <img alt="{{- $.Text -}}" srcset="{{ $image_jpg_360.RelPermalink }} 360w, {{ $image_jpg_500.RelPermalink }} 500w, {{ $image_jpg_816.RelPermalink }} 816w {{- with $image_jpg_1632 -}},{{ .RelPermalink }} 1632w{{- end -}}"
+                     sizes="(max-width: 424px) 360px, (max-width: 596px) 500px, (min-width: 565px) 816px {{- if gt $original_img.Width 1632 -}},(min-width: 1200px) 1632px{{- end -}}"
+                     src="{{ with $image_jpg_816 -}}{{ .RelPermalink }}{{- end -}}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" loading="lazy" width="{{- $image_jpg_816.Width -}}" height="{{- $image_jpg_816.Height -}}" />
+	{{- else -}}
+			<picture><source type="image/webp" srcset="{{- if eq .MediaType.SubType "webp" -}}{{ $original_img.RelPermalink }}{{- else -}}{{ $image_webp_full.RelPermalink }}{{- end -}}" />
+			         <img alt="{{- $.Text -}}" src="{{- if eq .MediaType.SubType "jpeg" -}}{{ $original_img.RelPermalink }}{{- else -}}{{ $image_jpg_full.RelPermalink }}{{- end -}}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" width="{{- $original_img.Width -}}" height="{{- $original_img.Height -}}" loading="lazy" />
+	{{- end -}}
+                </picture>
+    			{{- if and (gt $original_img.Width 1000) (eq $autolinking true ) -}}</a>{{- end -}}
+                <figcaption>{{- with $.Title | safeHTML }}{{ . }}{{ end -}}</figcaption></figure>
+{{- else -}} 
+<img src="{{ .Destination | safeURL }}" alt="{{ $.Text }}" title="{{- with $.Title | safeHTML }}{{ . }}{{ end -}}" loading="lazy" /> 
+{{- end -}}
+<p>

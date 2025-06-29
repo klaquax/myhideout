@@ -1,0 +1,7 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'Puffin from Pluto'
+
+theme = 'gallery'
+author = 'Micha'
+
