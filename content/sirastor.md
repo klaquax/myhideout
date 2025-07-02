@@ -17,4 +17,4 @@ Wahrscheinlich wurde er nicht weit von dort entführt.
 Wie ich Ihn kenne, hat er seinen Entführern noch ein ordentliches Ei ins Nest gelegt.
 Ich habe gehört du seist jemand, der jeden Stein umdreht, dann wirst du bestimmt fündig.
 
-# ![Ich](/images/icke.jpg)
+![Versteck](/images/versteck.jpg)
